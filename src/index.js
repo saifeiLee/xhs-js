@@ -1,6 +1,14 @@
 const axios = require('axios');
 const qs = require('querystring');
 
+const {
+  ErrorEnum,
+  DataFetchError,
+  IPBlockError,
+  SignError,
+  NeedVerifyError
+} = require('./exception');
+
 class XhsClient {
 	constructor({
 		cookie = null,
@@ -80,10 +88,10 @@ class XhsClient {
 			const data = response.data;
 			if (data.success) {
 				return data.data || data.success;
-			} else if (data.code === ErrorEnum.IP_BLOCK.value.code) {
-				throw new IPBlockError(ErrorEnum.IP_BLOCK.value.msg, response);
-			} else if (data.code === ErrorEnum.SIGN_FAULT.value.code) {
-				throw new SignError(ErrorEnum.SIGN_FAULT.value.msg, response);
+			} else if (data.code === ErrorEnum.IP_BLOCK.code) {
+				throw new IPBlockError(ErrorEnum.IP_BLOCK.msg, response);
+			} else if (data.code === ErrorEnum.SIGN_FAULT.code) {
+				throw new SignError(ErrorEnum.SIGN_FAULT.msg, response);
 			} else {
 				throw new DataFetchError(data, response);
 			}
@@ -123,28 +131,29 @@ class XhsClient {
 		}
 		return this.request('POST', `${endpoint}${uri}`, { ...config, data });
 	}
+
+    /**
+     * 获取笔记详情
+     * @param {string} noteId 
+     * @returns 
+     */
+	async getNoteById(noteId) {
+		const data = {
+			source_note_id: noteId,
+			image_scenes: ["CRD_WM_WEBP"]
+		};
+		const uri = "/api/sns/web/v1/feed";
+		
+		try {
+			const res = await this.post(uri, data);
+			return res.items[0].note_card;
+		} catch (error) {
+			console.error("Error fetching note:", error);
+			throw error;
+		}
+	}
 }
 
-// Error classes (you'll need to implement these)
-class NeedVerifyError extends Error {
-	// ...
-}
 
-class IPBlockError extends Error {
-	// ...
-}
-
-class SignError extends Error {
-	// ...
-}
-
-class DataFetchError extends Error {
-	// ...
-}
-
-// Enum (you'll need to implement this)
-const ErrorEnum = {
-	// ...
-};
 
 module.exports = XhsClient;
