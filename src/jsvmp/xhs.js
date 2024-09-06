@@ -10,15 +10,15 @@ const dom = new JSDOM(html,{
     contentType: "text/html",
     resources: resourceLoader,
 })
-window = dom.window;
-document = window.document;
-DOMParser = window.DOMParser;
-location = window.location;
-navigator = window.navigator;
-history = window.history;
-screen = window.screen;
-localStorage = window.localStorage;
-WebGLRenderingContext = window.WebGLRenderingContext;
+var window = dom.window;
+var document = window.document;
+var DOMParser = window.DOMParser;
+var location = window.location;
+var navigator = window.navigator;
+var history = window.history;
+var screen = window.screen;
+var localStorage = window.localStorage;
+var WebGLRenderingContext = window.WebGLRenderingContext;
 window.HTMLCanvasElement.prototype.getContext = () => {
     return 'native code'
 };

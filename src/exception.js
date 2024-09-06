@@ -11,6 +11,7 @@ const ErrorEnum = {
 class DataFetchError extends Error {
   constructor(message) {
     super(message);
+    this.message = message;
     this.name = "DataFetchError";
   }
 }
@@ -18,6 +19,7 @@ class DataFetchError extends Error {
 class IPBlockError extends Error {
   constructor(message) {
     super(message);
+    this.message = message;
     this.name = "IPBlockError";
   }
 }
@@ -25,6 +27,7 @@ class IPBlockError extends Error {
 class SignError extends Error {
   constructor(message) {
     super(message);
+    this.message = message;
     this.name = "SignError";
   }
 }
@@ -32,6 +35,7 @@ class SignError extends Error {
 class NeedVerifyError extends Error {
   constructor(message, verifyType = null, verifyUuid = null) {
     super(message);
+    this.message = message;
     this.name = "NeedVerifyError";
     this.verifyType = verifyType;
     this.verifyUuid = verifyUuid;

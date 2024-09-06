@@ -72,7 +72,7 @@ class XhsClient {
 			const response = await this.axiosInstance({ method, url, ...config });
 
 			if (!response.data) return response;
-
+			// console.log('response', response)
 			if (response.status === 471 || response.status === 461) {
 				const verifyType = response.headers['verifytype'];
 				const verifyUuid = response.headers['verifyuuid'];
@@ -90,7 +90,7 @@ class XhsClient {
 				throw new DataFetchError(data, response);
 			}
 		} catch (error) {
-			if (error.response && error.response.status === 471 || error.response.status === 461) {
+			if (error.response && (error.response.status === 471 || error.response.status) === 461) {
 				// Handle verification error
 				const verifyType = error.response.headers['verifytype'];
 				const verifyUuid = error.response.headers['verifyuuid'];
