@@ -1,12 +1,13 @@
 const axios = require('axios');
 const qs = require('querystring');
-
+const { get_xs } = require('./jsvmp/xhs');
+const { getXCommon } = require('./help');
 const {
-  ErrorEnum,
-  DataFetchError,
-  IPBlockError,
-  SignError,
-  NeedVerifyError
+	ErrorEnum,
+	DataFetchError,
+	IPBlockError,
+	SignError,
+	NeedVerifyError
 } = require('./exception');
 
 class XhsClient {
@@ -15,11 +16,9 @@ class XhsClient {
 		userAgent = null,
 		timeout = 10000,
 		proxies = null,
-		sign = null
 	} = {}) {
 		this.proxies = proxies;
 		this.timeout = timeout;
-		this.externalSign = sign;
 		this._host = "https://edith.xiaohongshu.com";
 		this._creatorHost = "https://creator.xiaohongshu.com";
 		this._customerHost = "https://customer.xiaohongshu.com";
@@ -55,28 +54,23 @@ class XhsClient {
 		return cookieStr ? qs.parse(cookieStr.replace(/; /g, '&')) : {};
 	}
 
-	_preHeaders(url, data = null, quickSign = false) {
-		if (quickSign) {
-			// Implement sign function
-			const signs = sign(url, data, this.cookieDict.a1);
-			this.axiosInstance.defaults.headers['x-s'] = signs['x-s'];
-			this.axiosInstance.defaults.headers['x-t'] = signs['x-t'];
-			this.axiosInstance.defaults.headers['x-s-common'] = signs['x-s-common'];
-		} else {
-			const headersUpdated = this.externalSign(
-				url,
-				data,
-				this.cookieDict.a1,
-				this.cookieDict.web_session || ''
-			);
-			Object.assign(this.axiosInstance.defaults.headers, headersUpdated);
-		}
+	_preHeaders(url, data = null) {
+		let a1 = this.cookieDict.a1;
+		let b1 = ""
+		let x_s_result = get_xs(url, data, this.cookie);
+		const X_S = x_s_result['X-s']
+		const X_t = x_s_result['X-t'].toString()
+		const X_S_COMMON = getXCommon(a1, b1, X_S, X_t)
+
+		this.axiosInstance.defaults.headers['X-s'] = X_S
+		this.axiosInstance.defaults.headers['X-t'] = X_t
+		this.axiosInstance.defaults.headers['X-s-common'] = X_S_COMMON
 	}
 
 	async request(method, url, config = {}) {
 		try {
 			const response = await this.axiosInstance({ method, url, ...config });
-			
+
 			if (!response.data) return response;
 
 			if (response.status === 471 || response.status === 461) {
@@ -111,7 +105,7 @@ class XhsClient {
 		if (params) {
 			finalUri = `${uri}?${qs.stringify(params)}`;
 		}
-		this._preHeaders(finalUri, null, isCreator || isCustomer);
+		this._preHeaders(finalUri, null);
 		let endpoint = this._host;
 		if (isCustomer) {
 			endpoint = this._customerHost;
@@ -122,7 +116,7 @@ class XhsClient {
 	}
 
 	async post(uri, data = null, isCreator = false, isCustomer = false, config = {}) {
-		this._preHeaders(uri, data, isCreator || isCustomer);
+		this._preHeaders(uri, data);
 		let endpoint = this._host;
 		if (isCustomer) {
 			endpoint = this._customerHost;
@@ -132,18 +126,18 @@ class XhsClient {
 		return this.request('POST', `${endpoint}${uri}`, { ...config, data });
 	}
 
-    /**
-     * 获取笔记详情
-     * @param {string} noteId 
-     * @returns 
-     */
+	/**
+	 * 获取笔记详情
+	 * @param {string} noteId 
+	 * @returns 
+	 */
 	async getNoteById(noteId) {
 		const data = {
 			source_note_id: noteId,
 			image_scenes: ["CRD_WM_WEBP"]
 		};
 		const uri = "/api/sns/web/v1/feed";
-		
+
 		try {
 			const res = await this.post(uri, data);
 			return res.items[0].note_card;
