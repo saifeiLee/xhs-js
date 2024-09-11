@@ -70,7 +70,6 @@ class XhsClient {
 	async request(method, url, config = {}) {
 		try {
 			const response = await this.axiosInstance({ method, url, ...config });
-
 			if (!response.data) return response;
 			// console.log('response', response)
 			if (response.status === 471 || response.status === 461) {
@@ -116,12 +115,25 @@ class XhsClient {
 	}
 
 	async post(uri, data = null, isCreator = false, isCustomer = false, config = {}) {
+		let jsonStr = data ? JSON.stringify(data).replace(/[\u007F-\uFFFF]/g, function(chr) {
+			return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4);
+		  }) : null;
 		this._preHeaders(uri, data);
 		let endpoint = this._host;
 		if (isCustomer) {
 			endpoint = this._customerHost;
 		} else if (isCreator) {
 			endpoint = this._creatorHost;
+		}
+		if (data) {
+			return this.request('POST', `${endpoint}${uri}`, { 
+				...config,
+				data: jsonStr,
+				headers: {
+					...config.headers,
+					'Content-Type': 'application/json',
+				}
+			 });
 		}
 		return this.request('POST', `${endpoint}${uri}`, { ...config, data });
 	}
