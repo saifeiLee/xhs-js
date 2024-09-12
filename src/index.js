@@ -1,7 +1,10 @@
 const axios = require('axios');
 const qs = require('querystring');
 const { get_xs } = require('./jsvmp/xhs');
-const { getXCommon } = require('./help');
+const { 
+	getXCommon,
+	getSearchId
+ } = require('./help');
 const {
 	ErrorEnum,
 	DataFetchError,
@@ -9,6 +12,26 @@ const {
 	SignError,
 	NeedVerifyError
 } = require('./exception');
+
+const SearchSortType = Object.freeze({
+  // default
+  GENERAL: { value: "general" },
+  // most popular
+  MOST_POPULAR: { value: "popularity_descending" },
+  // Latest
+  LATEST: { value: "time_descending" }
+});
+
+const SearchNoteType = Object.freeze({
+  // default
+  ALL: { value: 0 },
+  // only video
+  VIDEO: { value: 1 },
+  // only image
+  IMAGE: { value: 2 }
+});
+
+
 
 class XhsClient {
 	constructor({
@@ -157,6 +180,100 @@ class XhsClient {
 			console.error("Error fetching note:", error);
 			throw error;
 		}
+	}
+
+	async getNoteByIdFromHtml(noteId) {
+		const camelToUnderscore = (key) => {
+			return key.replace(/([A-Z])/g, "_$1").toLowerCase();
+		};
+
+		const transformJsonKeys = (jsonData) => {
+			const dataDict = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+			const dictNew = {};
+			for (const [key, value] of Object.entries(dataDict)) {
+				const newKey = camelToUnderscore(key);
+				if (!value) {
+					dictNew[newKey] = value;
+				} else if (typeof value === 'object' && !Array.isArray(value)) {
+					dictNew[newKey] = transformJsonKeys(value);
+				} else if (Array.isArray(value)) {
+					dictNew[newKey] = value.map(item => 
+						item && typeof item === 'object' ? transformJsonKeys(item) : item
+					);
+				} else {
+					dictNew[newKey] = value;
+				}
+			}
+			return dictNew;
+		};
+
+		const url = `https://www.xiaohongshu.com/explore/${noteId}`;
+		try {
+			const response = await this.axiosInstance.get(url, {
+				headers: {
+					'user-agent': this.userAgent,
+					'referer': 'https://www.xiaohongshu.com/'
+				}
+			});
+
+			const html = response.data;
+			const stateMatch = html.match(/window.__INITIAL_STATE__=({.*})<\/script>/);
+			
+			if (stateMatch) {
+				const state = stateMatch[1].replace(/undefined/g, '""');
+				if (state !== "{}") {
+					const noteDict = transformJsonKeys(JSON.parse(state));
+					return noteDict.note.note_detail_map[noteId].note;
+				}
+			}
+
+			if (html.includes(ErrorEnum.IP_BLOCK.value)) {
+				throw new IPBlockError(ErrorEnum.IP_BLOCK.value);
+			}
+
+			throw new DataFetchError(html);
+		} catch (error) {
+			console.error("Error fetching note:", error);
+			throw error;
+		}
+	}
+
+	async getSelfInfo() {
+		const uri = "/api/sns/web/v1/user/selfinfo";
+		return this.get(uri);
+	}
+
+	async getSelfInfoV2() {
+		const uri = "/api/sns/web/v2/user/me";
+		return this.get(uri);
+	}
+	
+	async getUserInfo(userId) {
+		const uri = '/api/sns/web/v1/user/otherinfo'
+		const params = {
+			"target_user_id": userId
+		}
+		return this.get(uri, params);
+	}
+
+	async getNoteByKeyword(
+		keyword,
+		page = 1,
+		pageSize = 20,
+		sort = SearchSortType.GENERAL,
+		noteType = SearchNoteType.ALL
+	) {
+		const uri = "/api/sns/web/v1/search/notes";
+		const data = {
+			keyword: keyword,
+			page: page,
+			page_size: pageSize,
+			search_id: getSearchId(),
+			sort: sort.value,
+			note_type: noteType.value,
+		};
+
+		return this.post(uri, data);
 	}
 }
 

@@ -219,6 +219,16 @@ function getXCommon(a1="", b1 = "", xS = undefined, xT = undefined) {
     return x_s_common;
 }
 
+function getSearchId() {
+    const e = BigInt(Date.now()) << 64n;
+    const t = Math.floor(Math.random() * 2147483647);
+    return base36encode(e + BigInt(t));
+}
+
+function base36encode(num) {
+    return num.toString(36).toUpperCase();
+}
+
 
 module.exports = {
     getXCommon,
