@@ -5,7 +5,7 @@ const oldCookie = 'abRequestId=6a42c3f7-5f4c-572e-9847-bc733cc61073; a1=18f74e3b
 
 const client = new XhsClient({
     cookie: cookie
-}); 
+});
 function test_getNoteById() {
     const noteId = '66d90590000000001f01fe31';
     client.getNoteById(noteId).then(res => {
@@ -15,11 +15,22 @@ function test_getNoteById() {
 function test_getNoteByIdFromHtml() {
     const client = new XhsClient({
         cookie: cookie
-    }); 
+    });
     const noteId = '66d90590000000001f01fe31';
     client.getNoteByIdFromHtml(noteId).then(res => {
         console.log('笔记数据:', res)
     })
 }
 
-test_getNoteByIdFromHtml()
+// test_getNoteByIdFromHtml()
+async function testSearchNote() {
+    const keyword = '旅游';
+    const client = new XhsClient({
+        cookie: cookie
+    });
+    const result = await client.getNoteByKeyword(
+        keyword,
+    );
+    console.log(result)
+}   
+testSearchNote()

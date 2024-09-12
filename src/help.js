@@ -228,11 +228,32 @@ function getSearchId() {
 function base36encode(num) {
     return num.toString(36).toUpperCase();
 }
-
+const SearchSortType = Object.freeze({
+    // default
+    GENERAL: { value: "general" },
+    // most popular
+    MOST_POPULAR: { value: "popularity_descending" },
+    // Latest
+    LATEST: { value: "time_descending" }
+  });
+  
+  const SearchNoteType = Object.freeze({
+    // default
+    ALL: { value: 0 },
+    // only video
+    VIDEO: { value: 1 },
+    // only image
+    IMAGE: { value: 2 }
+  });
+  
+  
 
 module.exports = {
     getXCommon,
     encodeUtf8,
     mrc,
-    encodeChunk
+    encodeChunk,
+    getSearchId,
+    SearchSortType,
+    SearchNoteType,
 }

@@ -3,7 +3,9 @@ const qs = require('querystring');
 const { get_xs } = require('./jsvmp/xhs');
 const { 
 	getXCommon,
-	getSearchId
+	getSearchId,
+	SearchSortType,
+	SearchNoteType
  } = require('./help');
 const {
 	ErrorEnum,
@@ -12,24 +14,6 @@ const {
 	SignError,
 	NeedVerifyError
 } = require('./exception');
-
-const SearchSortType = Object.freeze({
-  // default
-  GENERAL: { value: "general" },
-  // most popular
-  MOST_POPULAR: { value: "popularity_descending" },
-  // Latest
-  LATEST: { value: "time_descending" }
-});
-
-const SearchNoteType = Object.freeze({
-  // default
-  ALL: { value: 0 },
-  // only video
-  VIDEO: { value: 1 },
-  // only image
-  IMAGE: { value: 2 }
-});
 
 
 
@@ -271,6 +255,8 @@ class XhsClient {
 			search_id: getSearchId(),
 			sort: sort.value,
 			note_type: noteType.value,
+			image_formats: ["jpg", "webp", "avif"],
+			ext_flags: [],
 		};
 
 		return this.post(uri, data);
