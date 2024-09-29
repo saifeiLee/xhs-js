@@ -30,3 +30,7 @@ npm run test
 - getNoteByKeyword: 根据关键词搜索笔记
 - getNoteComments: 获取笔记评论
 - getUserNotes: 获取用户笔记
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=saifeiLee/xhs-js&type=Date)](https://star-history.com/#saifeiLee/xhs-js&Date)
