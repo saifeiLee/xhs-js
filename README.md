@@ -20,3 +20,13 @@ npm install
 npm run test
 
 ```
+
+## API
+
+- getNoteById: 获取笔记详情
+- getNoteByIdFromHtml: 从html中获取笔记详情
+- getSelfInfo: 获取账号个人信息
+- getUserInfo: 获取指定用户信息
+- getNoteByKeyword: 根据关键词搜索笔记
+- getNoteComments: 获取笔记评论
+- getUserNotes: 获取用户笔记
