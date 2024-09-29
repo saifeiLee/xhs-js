@@ -237,6 +237,15 @@ class XhsClient {
 		return this.get(uri, params);
 	}
 
+	/**
+	 * 
+	 * @param {string} keyword 关键词
+	 * @param {number} page 页码
+	 * @param {number} pageSize 分页查询的数量
+	 * @param {string} sort 搜索的类型,分为: general, popularity_descending, time_descending
+	 * @param {number} noteType 笔记类型
+	 * @returns 
+	 */
 	async getNoteByKeyword(
 		keyword,
 		page = 1,
@@ -259,6 +268,12 @@ class XhsClient {
 		return this.post(uri, data);
 	}
 
+	/**
+	 * 获取笔记评论
+	 * @param {string} noteId 笔记id
+	 * @param {string} cursor 分页查询的下标,默认为""
+	 * @returns 
+	 */
 	async getNoteComments(noteId, cursor="") {
 		const uri = "/api/sns/web/v2/comment/page"
 		const params = {
