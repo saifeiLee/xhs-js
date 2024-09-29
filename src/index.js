@@ -258,6 +258,15 @@ class XhsClient {
 
 		return this.post(uri, data);
 	}
+
+	async getNoteComments(noteId, cursor="") {
+		const uri = "/api/sns/web/v2/comment/page"
+		const params = {
+			"note_id": noteId,
+			"cursor": cursor,
+		}
+		return this.get(uri, params);
+	}
 }
 
 

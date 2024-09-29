@@ -51,10 +51,16 @@ describe('XhsClient', () => {
       SearchSortType.GENERAL,
       SearchNoteType.ALL
     );
-    console.log(result)
     expect(result).toBeDefined();
     expect(result.has_more).toBeDefined();
     expect(Array.isArray(result.items)).toBe(true);
+  });
+
+  test('getNoteComments', async () => {
+    const noteId = '66adced2000000002701ca09';
+    const result = await client.getNoteComments(noteId);
+    expect(result).toBeDefined();
+    expect(result.comments).toBeDefined();
   });
 });
 
