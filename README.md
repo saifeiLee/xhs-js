@@ -9,4 +9,4 @@
 - [example/index.js](./example/index.js)
 - [test/xhs.test.js](./test/xhs.test.js)
 
-**点个star再走吧~**
+🌟**点个star🌟再走吧~**🌟
