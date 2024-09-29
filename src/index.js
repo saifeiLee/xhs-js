@@ -282,6 +282,23 @@ class XhsClient {
 		}
 		return this.get(uri, params);
 	}
+
+	/**
+	 * 获取用户笔记
+	 * @param {*} userId 
+	 * @param {*} cursor 
+	 * @returns 
+	 */
+	async getUserNotes(userId, cursor = "") {
+		const uri = "/api/sns/web/v1/user_posted"
+		const params = {
+			"cursor": cursor,
+			"num": 30,
+			"user_id": userId,
+			"image_scenes": "FD_WM_WEBP"
+		}
+		return this.get(uri, params);
+	}
 }
 
 
