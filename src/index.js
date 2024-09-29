@@ -68,7 +68,6 @@ class XhsClient {
 		const X_S = x_s_result['X-s']
 		const X_t = x_s_result['X-t'].toString()
 		const X_S_COMMON = getXCommon(a1, b1, X_S, X_t)
-
 		this.axiosInstance.defaults.headers['X-s'] = X_S
 		this.axiosInstance.defaults.headers['X-t'] = X_t
 		this.axiosInstance.defaults.headers['X-s-common'] = X_S_COMMON
@@ -122,9 +121,7 @@ class XhsClient {
 	}
 
 	async post(uri, data = null, isCreator = false, isCustomer = false, config = {}) {
-		let jsonStr = data ? JSON.stringify(data).replace(/[\u007F-\uFFFF]/g, function(chr) {
-			return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4);
-		  }) : null;
+		let jsonStr = data ? JSON.stringify(data) : null;
 		this._preHeaders(uri, data);
 		let endpoint = this._host;
 		if (isCustomer) {
