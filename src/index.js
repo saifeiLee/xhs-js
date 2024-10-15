@@ -301,13 +301,37 @@ class XhsClient {
 	}
 
 	/**
-	 * 获取账号通知
+	 * 获取账号@我通知
 	 * @param {*} num 
 	 * @param {*} cursor 
 	 * @returns 
 	 */
 	async getMentionNotifications(num = 20, cursor = "") {
 		const uri = "/api/sns/web/v1/you/mentions"
+		const params = { "num": num, "cursor": cursor }
+		return this.get(uri, params);
+	}
+
+	/**
+	 * 获取点赞通知
+	 * @param {*} num 
+	 * @param {*} cursor 
+	 * @returns 
+	 */
+	async getLikeNotifications(num = 20, cursor = "") {
+		const uri = "/api/sns/web/v1/you/likes"
+		const params = { "num": num, "cursor": cursor }
+		return this.get(uri, params);
+	}
+
+	/**
+	 * 获取关注通知
+	 * @param {*} num 
+	 * @param {*} cursor 
+	 * @returns 
+	 */
+	async getFollowNotifications(num = 20, cursor = "") {
+		const uri = "/api/sns/web/v1/you/connections"
 		const params = { "num": num, "cursor": cursor }
 		return this.get(uri, params);
 	}

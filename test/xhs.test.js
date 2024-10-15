@@ -76,5 +76,17 @@ describe('XhsClient', () => {
     expect(result).toBeDefined();
     expect(result.message_list).toBeDefined();
   });
+
+  test('getLikeNotifications', async () => {
+    const result = await client.getLikeNotifications();
+    expect(result).toBeDefined();
+    expect(result.message_list).toBeDefined();
+  })
+
+  test('getFollowNotifications', async () => {
+    const result = await client.getFollowNotifications();
+    expect(result).toBeDefined();
+    expect(result.message_list).toBeDefined();
+  });
 });
 

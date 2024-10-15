@@ -30,7 +30,9 @@ npm run test
 - getNoteByKeyword: 根据关键词搜索笔记
 - getNoteComments: 获取笔记评论
 - getUserNotes: 获取用户笔记
-- getMentionNotifications: 获取用户通知列表
+- getMentionNotifications: 获取用户@通知
+- getLikeNotifications: 获取用户点赞通知
+- getFollowNotifications: 获取用户关注通知
 
 ## Star History
 
