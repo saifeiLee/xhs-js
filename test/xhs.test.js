@@ -70,5 +70,11 @@ describe('XhsClient', () => {
     expect(result).toBeDefined();
     expect(result.notes).toBeDefined();
   });
+
+  test("getMentionNotifications", async () => {
+    const result = await client.getMentionNotifications();
+    expect(result).toBeDefined();
+    expect(result.message_list).toBeDefined();
+  });
 });
 

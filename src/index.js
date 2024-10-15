@@ -1,12 +1,12 @@
 const axios = require('axios');
 const qs = require('querystring');
 const { get_xs } = require('./jsvmp/xhs');
-const { 
+const {
 	getXCommon,
 	getSearchId,
 	SearchSortType,
 	SearchNoteType
- } = require('./help');
+} = require('./help');
 const {
 	ErrorEnum,
 	DataFetchError,
@@ -130,14 +130,14 @@ class XhsClient {
 			endpoint = this._creatorHost;
 		}
 		if (data) {
-			return this.request('POST', `${endpoint}${uri}`, { 
+			return this.request('POST', `${endpoint}${uri}`, {
 				...config,
 				data: jsonStr,
 				headers: {
 					...config.headers,
 					'Content-Type': 'application/json',
 				}
-			 });
+			});
 		}
 		return this.request('POST', `${endpoint}${uri}`, { ...config, data });
 	}
@@ -178,7 +178,7 @@ class XhsClient {
 				} else if (typeof value === 'object' && !Array.isArray(value)) {
 					dictNew[newKey] = transformJsonKeys(value);
 				} else if (Array.isArray(value)) {
-					dictNew[newKey] = value.map(item => 
+					dictNew[newKey] = value.map(item =>
 						item && typeof item === 'object' ? transformJsonKeys(item) : item
 					);
 				} else {
@@ -199,7 +199,7 @@ class XhsClient {
 
 			const html = response.data;
 			const stateMatch = html.match(/window.__INITIAL_STATE__=({.*})<\/script>/);
-			
+
 			if (stateMatch) {
 				const state = stateMatch[1].replace(/undefined/g, '""');
 				if (state !== "{}") {
@@ -228,7 +228,7 @@ class XhsClient {
 		const uri = "/api/sns/web/v2/user/me";
 		return this.get(uri);
 	}
-	
+
 	async getUserInfo(userId) {
 		const uri = '/api/sns/web/v1/user/otherinfo'
 		const params = {
@@ -274,7 +274,7 @@ class XhsClient {
 	 * @param {string} cursor 分页查询的下标,默认为""
 	 * @returns 
 	 */
-	async getNoteComments(noteId, cursor="") {
+	async getNoteComments(noteId, cursor = "") {
 		const uri = "/api/sns/web/v2/comment/page"
 		const params = {
 			"note_id": noteId,
@@ -297,6 +297,18 @@ class XhsClient {
 			"user_id": userId,
 			"image_scenes": "FD_WM_WEBP"
 		}
+		return this.get(uri, params);
+	}
+
+	/**
+	 * 获取账号通知
+	 * @param {*} num 
+	 * @param {*} cursor 
+	 * @returns 
+	 */
+	async getMentionNotifications(num = 20, cursor = "") {
+		const uri = "/api/sns/web/v1/you/mentions"
+		const params = { "num": num, "cursor": cursor }
 		return this.get(uri, params);
 	}
 }
