@@ -33,6 +33,7 @@ npm run test
 - getMentionNotifications: 获取用户@通知
 - getLikeNotifications: 获取用户点赞通知
 - getFollowNotifications: 获取用户关注通知
+- getUserInfoFromHtml: 从html中获取用户信息
 
 ## Star History
 

@@ -88,5 +88,12 @@ describe('XhsClient', () => {
     expect(result).toBeDefined();
     expect(result.message_list).toBeDefined();
   });
+
+  test('getUserInfoFromHtml', async () => {
+    const userId = '66ddd49f000000001d020d91';
+    const result = await client.getUserInfoFromHtml(userId);
+    expect(result).toBeDefined();
+    expect(result.nickname).toBeDefined();
+  });
 });
 

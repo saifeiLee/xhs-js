@@ -15,7 +15,29 @@ const {
 	NeedVerifyError
 } = require('./exception');
 
+const camelToUnderscore = (key) => {
+	return key.replace(/([A-Z])/g, "_$1").toLowerCase();
+};
 
+const transformJsonKeys = (jsonData) => {
+	const dataDict = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+	const dictNew = {};
+	for (const [key, value] of Object.entries(dataDict)) {
+		const newKey = camelToUnderscore(key);
+		if (!value) {
+			dictNew[newKey] = value;
+		} else if (typeof value === 'object' && !Array.isArray(value)) {
+			dictNew[newKey] = transformJsonKeys(value);
+		} else if (Array.isArray(value)) {
+			dictNew[newKey] = value.map(item =>
+				item && typeof item === 'object' ? transformJsonKeys(item) : item
+			);
+		} else {
+			dictNew[newKey] = value;
+		}
+	}
+	return dictNew;
+};
 
 class XhsClient {
 	constructor({
@@ -164,30 +186,6 @@ class XhsClient {
 	}
 
 	async getNoteByIdFromHtml(noteId) {
-		const camelToUnderscore = (key) => {
-			return key.replace(/([A-Z])/g, "_$1").toLowerCase();
-		};
-
-		const transformJsonKeys = (jsonData) => {
-			const dataDict = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
-			const dictNew = {};
-			for (const [key, value] of Object.entries(dataDict)) {
-				const newKey = camelToUnderscore(key);
-				if (!value) {
-					dictNew[newKey] = value;
-				} else if (typeof value === 'object' && !Array.isArray(value)) {
-					dictNew[newKey] = transformJsonKeys(value);
-				} else if (Array.isArray(value)) {
-					dictNew[newKey] = value.map(item =>
-						item && typeof item === 'object' ? transformJsonKeys(item) : item
-					);
-				} else {
-					dictNew[newKey] = value;
-				}
-			}
-			return dictNew;
-		};
-
 		const url = `https://www.xiaohongshu.com/explore/${noteId}`;
 		try {
 			const response = await this.axiosInstance.get(url, {
@@ -335,7 +333,35 @@ class XhsClient {
 		const params = { "num": num, "cursor": cursor }
 		return this.get(uri, params);
 	}
+
+	async getUserInfoFromHtml(userId) {
+		const url = `https://www.xiaohongshu.com/user/profile/${userId}`
+		try {
+			const response = await this.axiosInstance.get(url, {
+				headers: {
+					'user-agent': this.userAgent,
+					'referer': 'https://www.xiaohongshu.com/'
+				}
+			});
+			const html = response.data;
+			const stateMatch = html.match(/window.__INITIAL_STATE__=({.*})<\/script>/);
+			if (stateMatch) {
+				const state = stateMatch[1].replace(/"undefined"/g, '"_"').replace(/\bundefined\b/g, '""');
+				if (state !== "{}") {
+					const parsedState = JSON.parse(state);
+					const userBasicInfo = transformJsonKeys(parsedState).user.user_page_data.basic_info;
+					return userBasicInfo;
+				}
+			}
+			return response.data;
+		} catch (error) {
+			console.error("Error fetching user info:", error);
+			throw error;
+		}
+	}
 }
+
+
 
 
 
