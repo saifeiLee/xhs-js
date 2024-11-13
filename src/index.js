@@ -166,13 +166,19 @@ class XhsClient {
 
 	/**
 	 * 获取笔记详情
+	 * 注意: 需要xsec_token
 	 * @param {string} noteId 
 	 * @returns 
 	 */
-	async getNoteById(noteId) {
+	async getNoteById(noteId, xsecToken, xsecSource = "pc_feed") {
+		if (!xsecToken) {
+			throw new Error("xsecToken is required");
+		}
 		const data = {
 			source_note_id: noteId,
-			image_scenes: ["CRD_WM_WEBP"]
+			image_scenes: ["CRD_WM_WEBP"],
+			xsec_token: xsecToken,
+			xsec_source: xsecSource
 		};
 		const uri = "/api/sns/web/v1/feed";
 
@@ -185,8 +191,8 @@ class XhsClient {
 		}
 	}
 
-	async getNoteByIdFromHtml(noteId) {
-		const url = `https://www.xiaohongshu.com/explore/${noteId}`;
+	async getNoteByIdFromHtml(noteId, xsecToken, xsecSource = "pc_feed") {
+		const url = `https://www.xiaohongshu.com/explore/${noteId}?xsec_token=${xsecToken}&xsec_source=${xsecSource}`;
 		try {
 			const response = await this.axiosInstance.get(url, {
 				headers: {
